@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GifTastic</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="buttons-area"></div>
+
+        <form id="gif-form">
+            <label for="gif-input">Add an animal!</label><br>
+            <input type="text" id="gif-input"><br>
+            <input type="submit" id="add-gif">
+        </form>
+
+        <div id="gif-dump">
+            
+        </div>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+    var animals = ["Cat", "Dog", "Red Panda", "Lion", "Tiger", "Horse", "Pig", "Cow"];
+
+
+    $(document).on("click", ".gifBtn", function() {
+
+        var gif = $(this).attr("data-name")
+        var queryUrl = "https://api.giphy.com/v1/gifs/search?q=" + gif + "&api_key=im8KiiCRCTzThbzQS89Do0VwinVgazba&limit=10";
+   
+        $.ajax({
+            url: queryUrl,
+            method: "GET"
+        }).then(function(response){
+            console.log(response)
+
+            var results = response.data
+
+            for (var j = 0; j < results.length; j++) {
+                if (results[j].rating !== "r" && results[j].rating !== "pg-13") {
+                var gifDiv = $("<div>");
+
+                var rating = results[j].rating;
+
+                var p = $("<p>").text("Rating: " + rating);
+
+                var gifImage = $("<img>");
+                
+
+                gifImage.attr("src", results[j].images.fixed_height.url);
+                gifImage.addClass("giphy");
+                
+                
+                gifDiv.append(p);
+                gifDiv.append(gifImage);
+
+                $("#gif-dump").prepend(gifDiv);
+            
+                }
+            };
+        });
+    });
+   
+
+// function to create buttons!
+    function renderButtons(){
+        $(".buttons-area").empty();
+// loops through animal array
+        for (var i = 0; i < animals.length; i++) {
+            // uses jQuery to make buttons
+            var button = $("<button>");
+// adds class to buttons
+            button.addClass("gifBtn");
+
+            button.attr("data-name", animals[i]);
+        // adds the text of the item to the buttons
+            button.text(animals[i]);
+
+            $(".buttons-area").append(button);
+        }
+    }
+
+// function to add buttons from input bar
+    $("#add-gif").on("click", function(event) {
+        event.preventDefault();
+
+        var newButton = $("#gif-input").val().trim();
+
+        animals.push(newButton);
+
+        renderButtons();
+    });
+
+
+   
+
+    renderButtons();
+
+
+</script>
+</body>
+
+</html>
